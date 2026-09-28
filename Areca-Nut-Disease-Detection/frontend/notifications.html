@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Alerts - Arecanut Agri Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #e53935;
+            color: white;
+        }
+
+        .btn-success {
+            background: #43a047;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #757575;
+            color: white;
+        }
+
+        .alert-list {
+            margin-top: 20px;
+        }
+
+        .alert-item {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .alert-item.inactive {
+            opacity: 0.6;
+            border-left-color: #999;
+        }
+
+        .alert-info {
+            flex-grow: 1;
+        }
+
+        .alert-info h3 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .alert-info p {
+            color: #666;
+            margin: 4px 0;
+            font-size: 14px;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .alert-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-increase {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .badge-decrease {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+
+        .badge-threshold {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+
+        .badge-active {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .badge-inactive {
+            background: #e0e0e0;
+            color: #757575;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .notification-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #43a047;
+        }
+
+        .notification-item.failed {
+            border-left-color: #e53935;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .info-box h4 {
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .alert-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .alert-actions {
+                margin-top: 15px;
+                width: 100%;
+            }
+
+            .alert-actions button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔔 Price Alerts</h1>
+            <p>Get notified when arecanut prices change in your market</p>
+        </header>
+
+        <!-- Create Alert Card -->
+        <div class="card">
+            <h2>Create New Alert</h2>
+            
+            <div class="info-box">
+                <h4>ℹ️ How it works</h4>
+                <p>Set up price alerts to receive email notifications when prices increase, decrease, or reach a specific threshold in your chosen market.</p>
+            </div>
+
+            <form id="alertForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userEmail">Your Email *</label>
+                        <input type="email" id="userEmail" required placeholder="farmer@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="market">Market *</label>
+                        <select id="market" required>
+                            <option value="">Select Market</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="alertType">Alert Type *</label>
+                        <select id="alertType" required>
+                            <option value="">Select Type</option>
+                            <option value="increase">Price Increase</option>
+                            <option value="decrease">Price Decrease</option>
+                            <option value="threshold">Reach Threshold Price</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="thresholdPercentageGroup">
+                        <label for="thresholdPercentage">Threshold (%) *</label>
+                        <input type="number" id="thresholdPercentage" step="0.1" min="0.1" placeholder="e.g., 2.0 for 2%">
+                    </div>
+
+                    <div class="form-group" id="thresholdPriceGroup" style="display: none;">
+                        <label for="thresholdPrice">Target Price (₹/Quintal) *</label>
+                        <input type="number" id="thresholdPrice" step="100" min="0" placeholder="e.g., 35000">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    🔔 Create Alert
+                </button>
+            </form>
+        </div>
+
+        <!-- My Alerts Card -->
+        <div class="card">
+            <h2>My Alerts</h2>
+            <div id="alertsList" class="alert-list">
+                <div class="loading">Loading alerts...</div>
+            </div>
+        </div>
+
+        <!-- Notification History Card -->
+        <div class="card">
+            <h2>Recent Notifications</h2>
+            <div id="notificationHistory" class="notification-history">
+                <div class="loading">Loading history...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        let currentUserEmail = '';
+
+        // Load markets on page load
+        async function loadMarkets() {
+            try {
+                const response = await fetch(`${API_BASE}/notifications/markets`);
+                const data = await response.json();
+                
+                const select = document.getElementById('market');
+                select.innerHTML = '<option value="">Select Market</option>';
+                
+                data.data.forEach(market => {
+                    const option = document.createElement('option');
+                    option.value = market.name;
+                    option.textContent = `${market.name} - ${market.state}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading markets:', error);
+            }
+        }
+
+        // Handle alert type change
+        document.getElementById('alertType').addEventListener('change', function() {
+            const percentageGroup = document.getElementById('thresholdPercentageGroup');
+            const priceGroup = document.getElementById('thresholdPriceGroup');
+            
+            if (this.value === 'threshold') {
+                percentageGroup.style.display = 'none';
+                priceGroup.style.display = 'block';
+                document.getElementById('thresholdPercentage').required = false;
+                document.getElementById('thresholdPrice').required = true;
+            } else {
+                percentageGroup.style.display = 'block';
+                priceGroup.style.display = 'none';
+                document.getElementById('thresholdPercentage').required = true;
+                document.getElementById('thresholdPrice').required = false;
+            }
+        });
+
+        // Create alert
+        document.getElementById('alertForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('userEmail').value;
+            const market = document.getElementById('market').value;
+            const alertType = document.getElementById('alertType').value;
+            const thresholdPercentage = document.getElementById('thresholdPercentage').value;
+            const thresholdPrice = document.getElementById('thresholdPrice').value;
+            
+            const alertData = {
+                user_email: email,
+                market: market,
+                alert_type: alertType,
+                threshold_percentage: alertType !== 'threshold' ? parseFloat(thresholdPercentage) : null,
+                threshold_price: alertType === 'threshold' ? parseFloat(thresholdPrice) : null
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/notifications/alerts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(alertData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Alert created successfully!');
+                    this.reset();
+                    currentUserEmail = email;
+                    loadAlerts(email);
+                } else {
+                    alert('❌ Failed to create alert');
+                }
+            } catch (error) {
+                console.error('Error creating alert:', error);
+                alert('❌ Error creating alert');
+            }
+        });
+
+        // Load alerts
+        async function loadAlerts(email) {
+            if (!email) {
+                document.getElementById('alertsList').innerHTML = '<div class="empty-state">Enter your email above to view your alerts</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/notifications/alerts?user_email=${encodeURIComponent(email)}`);
+                const data = await response.json();
+                
+                const container = document.getElementById('alertsList');
+                
+                if (data.count === 0) {
+                    container.innerHTML = '<div class="empty-state">📭 No alerts yet. Create your first alert above!</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.data.map(alert => `
+                    <div class="alert-item ${!alert.is_active ? 'inactive' : ''}">
+                        <div class="alert-info">
+                            <h3>${alert.market}</h3>
+                            <p>
+                                <span class="alert-badge badge-${alert.alert_type}">${alert.alert_type.toUpperCase()}</span>
+                                <span class="alert-badge ${alert.is_active ? 'badge-active' : 'badge-inactive'}">
+                                    ${alert.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </p>
+                            <p>
+                                ${alert.threshold_percentage ? `Threshold: ${alert.threshold_percentage}%` : ''}
+                                ${alert.threshold_price ? `Target Price: ₹${alert.threshold_price.toLocaleString()}` : ''}
+                            </p>
+                            <p>Created: ${new Date(alert.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div class="alert-actions">
+                            <button class="btn btn-secondary" onclick="toggleAlert('${alert.id}')">
+                                ${alert.is_active ? 'Pause' : 'Resume'}
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteAlert('${alert.id}')">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+                document.getElementById('alertsList').innerHTML = '<div class="empty-state">Error loading alerts</div>';
+            }
+        }
+
+        // Toggle alert
+        async function toggleAlert(alertId) {
+            try {
+                const response = await fetch(`${API_BASE}/notifications/alerts/${alertId}/toggle`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadAlerts(currentUserEmail);
+                }
+            } catch (error) {
+                console.error('Error toggling alert:', error);
+            }
+        }
+
+        // Delete alert
+        async function deleteAlert(alertId) {
+            if (!confirm('Are you sure you want to delete this alert?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/notifications/alerts/${alertId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadAlerts(currentUserEmail);
+                }
+            } catch (error) {
+                console.error('Error deleting alert:', error);
+            }
+        }
+
+        // Load notification history
+        async function loadNotificationHistory(email) {
+            if (!email) {
+                document.getElementById('notificationHistory').innerHTML = '<div class="empty-state">No notifications yet</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/notifications/history?user_email=${encodeURIComponent(email)}&limit=10`);
+                const data = await response.json();
+                
+                const container = document.getElementById('notificationHistory');
+                
+                if (data.count === 0) {
+                    container.innerHTML = '<div class="empty-state">📭 No notifications yet</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.data.map(notif => `
+                    <div class="notification-item ${notif.status === 'failed' ? 'failed' : ''}">
+                        <h4>${notif.market} - ${notif.change_percentage > 0 ? '📈' : '📉'} ${notif.change_percentage > 0 ? 'UP' : 'DOWN'}</h4>
+                        <p>Price: ₹${notif.old_price.toLocaleString()} → ₹${notif.new_price.toLocaleString()} (${notif.change_percentage > 0 ? '+' : ''}${notif.change_percentage}%)</p>
+                        <p>Sent: ${new Date(notif.sent_at).toLocaleString()} | Status: ${notif.status}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading history:', error);
+                document.getElementById('notificationHistory').innerHTML = '<div class="empty-state">Error loading history</div>';
+            }
+        }
+
+        // Auto-load alerts when email is entered
+        document.getElementById('userEmail').addEventListener('blur', function() {
+            currentUserEmail = this.value;
+            if (currentUserEmail) {
+                loadAlerts(currentUserEmail);
+                loadNotificationHistory(currentUserEmail);
+            }
+        });
+
+        // Initialize
+        loadMarkets();
+    </script>
+</body>
+</html>

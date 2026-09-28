@@ -1,0 +1,58 @@
+# ── Python ─────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+wheels/
+.installed.cfg
+
+# ── Virtual Environments ────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+backend/venv/
+
+# ── IDEs & Editors ──────────────────────────────────────
+.vscode/
+.idea/
+.kiro/
+*.swp
+*.swo
+*~
+
+# ── OS ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ────────────────────────────────────────────────
+*.log
+
+# ── Databases ───────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Environment / Secrets ───────────────────────────────
+.env
+.env.local
+*.key
+
+# ── Runtime / Cache ─────────────────────────────────────
+backend/price_cache.json
+uploads/
+temp/
+
+# ── Dataset (large – use Git LFS or host separately) ────
+Dataset/
+
+# ── ML model weights (large binary – use Git LFS) ───────
+*.h5
+*.pkl
+*.joblib

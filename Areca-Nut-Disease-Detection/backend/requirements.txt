@@ -1,0 +1,19 @@
+# Core API
+fastapi>=0.104.1
+uvicorn>=0.24.0
+python-multipart>=0.0.6
+
+# Data & Imaging
+pillow>=10.1.0
+numpy>=1.26.2
+
+# Validation & HTTP
+pydantic>=2.5.0
+requests>=2.31.0
+
+# ML — requires Python 3.10–3.12 (not 3.13+)
+# Install in a Python 3.11/3.12 virtual environment:
+#   python3.11 -m venv backend/venv
+#   backend/venv/Scripts/pip install -r requirements.txt
+tensorflow>=2.16.0   # Keras 3 compatible
+keras>=3.0.0         # standalone Keras 3 (matches saved model format)
